@@ -1,0 +1,247 @@
+#+STARTUP: overview
+
+Emacs initialization as org file.
+
+This file is org-babel-load-file'd by file:init.el
+
+To try it out, use
+
+#+BEGIN_SRC sh
+#emacs -q -l init.el
+#+END_SRC
+
+
+* Interface
+
+Interface tweaks 
+
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-message t
+      initial-scratch-message nil)
+
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode 1)
+
+(line-number-mode t)
+(column-number-mode t)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; make xdg-open work, to open files from within emacs
+;this messes up ipython
+;(setq process-connection-type nil)
+
+;; try fixing slow scrolling
+;(setq-default bidi-display-reordering  nil)
+
+;(setq-default indent-tabs-mode nil)
+(put 'narrow-to-region 'disabled nil)
+
+(use-package window-numbering
+  :ensure t
+  :init (window-numbering-mode t))
+
+;;(load-theme 'solarized t)
+#+END_SRC
+
+
+* Minor modes
+** paren
+
+ #+BEGIN_SRC emacs-lisp
+ (use-package paren
+    :ensure t
+    :config
+    (show-paren-mode t))
+ #+END_SRC
+
+** whick-key
+
+ Show possible completions when typing control sequences
+ (after some delay)
+
+ #+BEGIN_SRC emacs-lisp
+ (use-package which-key
+     :ensure t
+     :config
+     (which-key-mode))
+ #+END_SRC
+
+
+* company-mode
+
+company is an in-buffer code completion framework
+
+Use C-; to force completion
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+      :ensure t
+      :init
+      (global-company-mode t)
+      :bind ("C-;" . company-complete-common)
+      )
+
+#+END_SRC
+
+
+* ivy and counsel
+
+ivy is a narrowing-completion framework
+counsel uses ivy for better M-x, C-x f, etc.
+swiper uses ivy for better incremental search, C-s
+
+When we do not want completion, use C-M-j to select current input
+(i.e. want to create file bar when file bar2 exists)
+
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :ensure t
+    :init (ivy-mode 1)
+    :config
+    (setq ivy-use-virtual-buffers t
+          ivy-count-format "%d/%d "))
+
+  (use-package counsel
+    :ensure t
+    :bind*
+    (("M-x"         . counsel-M-x)
+     ("C-x C-f"     . counsel-find-file)
+     ))
+
+  (use-package swiper
+    :ensure t
+    :bind
+    (("C-s" . swiper)))
+
+
+#+END_SRC
+
+
+
+* yasnippet
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :init
+    (yas-global-mode 1))
+#+END_SRC
+
+* pdf-tools
+
+better alternative to DocView 
+
+#+BEGIN_SRC emacs-lisp
+  (use-package pdf-tools
+    :ensure t
+    :config
+    (setq-default pdf-view-display-size 'fit-page)
+    (pdf-tools-install :no-query))
+
+#+END_SRC
+
+* org-mode
+
+** org
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+      :ensure t
+      :config
+      (setq org-hide-emphasis-markers t)
+      ; show inline images
+      (org-display-inline-images t t)
+      (setq org-startup-with-inline-images "inlineimages")
+      ; press RET to follow links
+      (setq org-return-follows-link t)
+      (setq org-support-shift-select t)
+      ; use syntax highlighting in org-file code blocks
+      (setq org-src-fontify-natively t)
+      (setq org-element-use-cache nil)
+      (setq org-latex-to-pdf-process (list "latexmk -pdf %f"))
+      (setq org-agenda-files (quote ("/home/florian/Sync/Notes")))
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((python . t)
+	 (sqlite . t)
+	 ;(R . t)
+	 (shell . t)
+	 (dot . t)
+	 ;(julia . t)
+	 ))
+      (setq org-babel-sh-command "bash")
+      ; don't ask for permission when executing code blocks
+      (setq org-confirm-babel-evaluate nil)
+      (global-set-key (kbd "C-c a") 'org-agenda)
+      ;;file to save todo items
+      (setq org-agenda-files (quote ("/home/florian/Sync/Notes")))
+      (define-key global-map (kbd "C-c c") 'org-capture)
+      (setq org-capture-templates
+	    '(("t" "todo" entry (file+headline "/home/florian/Sync/Notes/TODO.org" "Tasks")
+	       "* TODO [#A] %?")
+	       ("c" "capture" entry (file "/home/florian/Sync/Notes/Capture.org")
+	       "* %?"
+	       :empty-lines 1)
+	      ("j" "journal" entry (file+datetree "/home/florian/Notes/Journal.org")
+	       "* Item: %?\n  %i\n  from: %a"
+	       :empty-lines 1)
+	      ))        
+  )
+
+#+END_SRC
+
+** org-noter 
+
+Annotation of PDF files in separate org-mode file
+
+Run  `M-x org-noter` on heading (in org file) or while viewing PDF
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-noter
+    :ensure t)
+#+END_SRC
+
+** org-ref
+
+#+BEGIN_SRC emacs-lisp
+    (use-package org-ref
+		 :after org
+		 :ensure t
+		 :config
+		 (setq bibtex-completion-bibliography '( "~/Sync/References/Bibliography.bib" ) ;the major bibtex file
+		       bibtex-completion-library-path "~/Sync/References/" ;the directory to store pdfs
+		       bibtex-completion-notes-path nil ;"~/Sync/References/" ;the note file for reference notes
+		       org-ref-default-bibliography '( "~/Sync/References/Bibliography.bib" )
+		       org-ref-bibliography-notes "~/Sync/References/"
+		       org-ref-pdf-directory "~/Sync/References/"
+		       org-ref-notes-function 'org-ref-notes-function-many-files))
+      
+	     
+#+END_SRC
+
+
+
+
+** faces
+
+How emacs displays is determined by faces.
+To figure out what face is being used for an element, position cursor on element and do 'C-u C-x ='
+
+#+BEGIN_SRC emacs-lisp
+    (set-face-attribute 'org-meta-line nil :height 0.8 :slant 'normal
+			:foreground "#C0C0C0")
+
+    (setq org-src-block-faces '(("emacs-lisp" (:background "ivory"))
+				("elisp" (:background "ivory"))
+				("python" (:background "ivory"))
+				("julia" (:background "ivory"))
+				("jupyter-julia" (:background "ivory"))
+				("jupyter-python" (:background "ivory"))
+				("shell" (:background "ivory"))
+				("sh" (:background "ivory"))
+				("R" (:background "ivory"))
+				))
+#+END_SRC
