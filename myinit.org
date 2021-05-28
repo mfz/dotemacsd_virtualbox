@@ -16,44 +16,85 @@ To try it out, use
 Interface tweaks 
 
 #+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-message t
-      initial-scratch-message nil)
+  (setq inhibit-startup-message t
+	initial-scratch-message nil)
 
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(menu-bar-mode 1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode 1)
 
-(line-number-mode t)
-(column-number-mode t)
+  (line-number-mode t)
+  (column-number-mode t)
 
-(defalias 'yes-or-no-p 'y-or-n-p)
+  (defalias 'yes-or-no-p 'y-or-n-p)
 
-;; make xdg-open work, to open files from within emacs
-;this messes up ipython
-;(setq process-connection-type nil)
+  ;; make xdg-open work, to open files from within emacs
+  ;this messes up ipython
+  ;(setq process-connection-type nil)
 
-;; try fixing slow scrolling
-;(setq-default bidi-display-reordering  nil)
+  ;; try fixing slow scrolling
+  ;(setq-default bidi-display-reordering  nil)
 
-;(setq-default indent-tabs-mode nil)
-(put 'narrow-to-region 'disabled nil)
+  ;(setq-default indent-tabs-mode nil)
+  (put 'narrow-to-region 'disabled nil)
 
-(use-package window-numbering
-  :ensure t
-  :init (window-numbering-mode t))
 
-;;(load-theme 'solarized t)
+
+
 #+END_SRC
 
 
+* Themes
+** Doom
+  
+  #+BEGIN_SRC emacs-lisp
+    (use-package doom-themes
+      :ensure t
+      :config
+      (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+	    doom-themes-enable-italic t) ; if nil, italics is universally disabled
+      (load-theme 'doom-solarized-light t)
+      ;(load-theme 'doom-one t)
+      (doom-themes-org-config))
+
+    (use-package all-the-icons ; need to run M-x all-the-icons-install-fonts
+      :ensure t)
+
+    (use-package doom-modeline
+      :ensure t
+      :init (doom-modeline-mode 1)
+      :custom (doom-modeline-height 15))
+
+ #+END_SRC
+
+ 
+** Solarized 
+
+ #+BEGIN_SRC emacs-lisp
+   (use-package solarized-theme
+     :disabled
+     :ensure t
+     :init (load-theme 'solarized-light t))
+ #+END_SRC
+      
+
 * Minor modes
+** window-numbering
+
+ #+BEGIN_SRC emacs-lisp
+   (use-package window-numbering
+    :ensure t
+    :init (window-numbering-mode t))
+ #+END_SRC
+   
+  
 ** paren
 
  #+BEGIN_SRC emacs-lisp
- (use-package paren
-    :ensure t
-    :config
-    (show-paren-mode t))
+   (use-package paren
+      :ensure t
+      :config
+      (show-paren-mode t))
  #+END_SRC
 
 ** whick-key
@@ -162,7 +203,7 @@ better alternative to DocView
       (setq org-src-fontify-natively t)
       (setq org-element-use-cache nil)
       (setq org-latex-to-pdf-process (list "latexmk -pdf %f"))
-      (setq org-agenda-files (quote ("/home/florian/Sync/Notes")))
+      (setq org-agenda-files (quote ("/home/florian/Notes")))
       (org-babel-do-load-languages
        'org-babel-load-languages
        '((python . t)
@@ -177,12 +218,12 @@ better alternative to DocView
       (setq org-confirm-babel-evaluate nil)
       (global-set-key (kbd "C-c a") 'org-agenda)
       ;;file to save todo items
-      (setq org-agenda-files (quote ("/home/florian/Sync/Notes")))
+      (setq org-agenda-files (quote ("/home/florian/Notes")))
       (define-key global-map (kbd "C-c c") 'org-capture)
       (setq org-capture-templates
-	    '(("t" "todo" entry (file+headline "/home/florian/Sync/Notes/TODO.org" "Tasks")
+	    '(("t" "todo" entry (file+headline "/home/florian/Notes/TODO.org" "Tasks")
 	       "* TODO [#A] %?")
-	       ("c" "capture" entry (file "/home/florian/Sync/Notes/Capture.org")
+	       ("c" "capture" entry (file "/home/florian/Notes/Capture.org")
 	       "* %?"
 	       :empty-lines 1)
 	      ("j" "journal" entry (file+datetree "/home/florian/Notes/Journal.org")
@@ -199,6 +240,9 @@ Annotation of PDF files in separate org-mode file
 
 Run  `M-x org-noter` on heading (in org file) or while viewing PDF
 
+Use `M-n` `M-p` to navigate when in org file, `n`, `p` to navigate when in pdf
+
+
 #+BEGIN_SRC emacs-lisp
   (use-package org-noter
     :ensure t)
@@ -206,20 +250,27 @@ Run  `M-x org-noter` on heading (in org file) or while viewing PDF
 
 ** org-ref
 
+add citation using `C-c ]`
+
+add item to bibliography:
+- use drag and drop of PDF file
+- M-x crossref-add-bibtex-entry 
+
+
 #+BEGIN_SRC emacs-lisp
-    (use-package org-ref
-		 :after org
-		 :ensure t
-		 :config
-		 (setq bibtex-completion-bibliography '( "~/Sync/References/Bibliography.bib" ) ;the major bibtex file
-		       bibtex-completion-library-path "~/Sync/References/" ;the directory to store pdfs
-		       bibtex-completion-notes-path nil ;"~/Sync/References/" ;the note file for reference notes
-		       org-ref-default-bibliography '( "~/Sync/References/Bibliography.bib" )
-		       org-ref-bibliography-notes "~/Sync/References/"
-		       org-ref-pdf-directory "~/Sync/References/"
-		       org-ref-notes-function 'org-ref-notes-function-many-files))
-      
-	     
+  (use-package org-ref
+	       :after org
+	       :ensure t
+	       :config
+	       (setq bibtex-completion-bibliography '( "~/Notes/References/Bibliography.bib" ) ;the major bibtex file
+		     bibtex-completion-library-path "~/Notes/References/" ;the directory to store pdfs
+		     bibtex-completion-notes-path nil ;"~/Notes/References/" ;the note file for reference notes
+		     org-ref-default-bibliography '( "~/Notes/References/Bibliography.bib" )
+		     org-ref-bibliography-notes "~/Notes/References/"
+		     org-ref-pdf-directory "~/Notes/References/"
+		     org-ref-notes-function 'org-ref-notes-function-many-files))
+
+
 #+END_SRC
 
 
@@ -231,17 +282,25 @@ How emacs displays is determined by faces.
 To figure out what face is being used for an element, position cursor on element and do 'C-u C-x ='
 
 #+BEGIN_SRC emacs-lisp
-    (set-face-attribute 'org-meta-line nil :height 0.8 :slant 'normal
-			:foreground "#C0C0C0")
+  (set-face-attribute 'org-meta-line nil :height 0.8 :slant 'normal
+		      :foreground "#C0C0C0")
 
-    (setq org-src-block-faces '(("emacs-lisp" (:background "ivory"))
-				("elisp" (:background "ivory"))
-				("python" (:background "ivory"))
-				("julia" (:background "ivory"))
-				("jupyter-julia" (:background "ivory"))
-				("jupyter-python" (:background "ivory"))
-				("shell" (:background "ivory"))
-				("sh" (:background "ivory"))
-				("R" (:background "ivory"))
-				))
+  (set-face-attribute 'org-block-begin-line nil :height 0.8 :slant 'normal
+		      :foreground "light grey")
+
+
+
+
+  ;; use Doom theme config instead
+  ;;
+  ;; (setq org-src-block-faces '(("emacs-lisp" (:background "ivory"))
+  ;; 			    ("elisp" (:background "ivory"))
+  ;; 			    ("python" (:background "ivory"))
+  ;; 			    ("julia" (:background "ivory"))
+  ;; 			    ("jupyter-julia" (:background "ivory"))
+  ;; 			    ("jupyter-python" (:background "ivory"))
+  ;; 			    ("shell" (:background "ivory"))
+  ;; 			    ("sh" (:background "ivory"))
+  ;; 			    ("R" (:background "ivory"))
+  ;; 			    ))
 #+END_SRC
