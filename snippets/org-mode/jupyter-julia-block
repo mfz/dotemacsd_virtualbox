@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: jupyter-julia-block
+# key: <jj
+# --
+#+BEGIN_SRC jupyter-julia :session ${1:jl}
+$0
+#+END_SRC

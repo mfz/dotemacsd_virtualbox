@@ -1,0 +1,27 @@
+# -*- mode: snippet -*-
+# name: argparse
+# key: argparse
+# --
+
+using ArgParse
+
+settings = ArgParseSettings(description = "$1")
+
+@add_arg_table settings begin
+
+   "--option", "-o"
+     help = "option with value"
+     default = 1
+     arg_type = Int
+
+   "--flag", "-f"
+     help = "a flag"
+     action = :store_true
+
+   "pos"
+     help = "a positional argument"
+     required = true
+
+end
+
+args = parse_args(ARGS, settings)
