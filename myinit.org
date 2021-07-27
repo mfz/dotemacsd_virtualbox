@@ -275,7 +275,18 @@ add item to bibliography:
 
 #+END_SRC
 
+** TODO org-pdftools
 
+Does not seem to work properly
+   
+create hyperlink pdftools:file.pdf
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-pdftools
+    :ensure t
+    :hook (org-mode . org-pdftools-setup-link))
+
+#+END_SRC
 
 
 ** faces
@@ -290,6 +301,8 @@ To figure out what face is being used for an element, position cursor on element
   (set-face-attribute 'org-block-begin-line nil :height 0.8 :slant 'normal
 		      :foreground "light grey")
 
+  (set-face-attribute 'org-block-end-line nil :height 0.8 :slant 'normal
+		      :foreground "light grey")
 
 
 
@@ -322,3 +335,41 @@ see, for example,  https://www.mortens.dev/blog/emacs-and-the-language-server-pr
     (lsp-enable-which-key-integration t))
 #+END_SRC
 
+
+* fz extensions
+
+** paste image from clipboard into org file
+
+TODO: ask user for filename, offer default
+   
+#+BEGIN_SRC emacs-lisp
+  (defvar fz/image-dir "Images")
+
+  (defun fz/ensure-directory (path)
+    "create directory if it does not exist and user agrees"
+    (when (and (not (file-exists-p path))
+	       (y-or-n-p (format "Directory %s does not exist. Create it?" path)))
+      (make-directory path :parents)))
+
+  (defun fz/paste-image-clipboard ()
+    "Paste screenshot from clipboard"
+    (interactive)
+    (fz/ensure-directory (file-name-as-directory fz/image-dir))
+    (let ((image-path (concat (file-name-as-directory fz/image-dir)
+			      (file-name-base (buffer-name))
+			      (format-time-string "_%Y_%m_%d__%H_%M_%S")
+			      ".png")))
+      (shell-command-to-string (format "xclip -selection clipboard -t image/png -o > %s" image-path))
+      (insert "[[file:" image-path "]]\n")
+      (org-display-inline-images)))
+
+#+END_SRC
+
+
+In order to use image resizing, e.g. `#+attr_org: :width 300`, one needs to set 
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-image-actual-width nil)
+#+END_SRC
+
+#+RESULTS:
