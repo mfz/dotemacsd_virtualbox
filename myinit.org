@@ -186,6 +186,28 @@ used for org-noter
 
 #+END_SRC
 
+
+* jupyter
+
+C-c C-c  evaluate expression
+Results shown as overlays
+
+C-c C-o  remove all overlays
+S-RET    un/fold multiline overlays
+
+  
+#+BEGIN_SRC emacs-lisp
+  (use-package julia-mode
+    :ensure t)
+
+  (use-package jupyter
+    :ensure t
+    :config
+    (require 'jupyter-python)
+    (require 'jupyter-julia)
+    (setq jupyter-eval-use-overlays t))
+#+END_SRC
+
 * org-mode
 
 ** org
@@ -213,7 +235,8 @@ used for org-noter
 	 ;(R . t)
 	 (shell . t)
 	 (dot . t)
-	 ;(julia . t)
+         ;(julia . t)
+	 (jupyter . t)
 	 ))
       (setq org-babel-sh-command "bash")
       ; don't ask for permission when executing code blocks
