@@ -296,6 +296,8 @@ Use `M-n` `M-p` to navigate when in org file, `n`, `p` to navigate when in pdf
 
 ** org-ref
 
+update to v3.0
+   
 add citation using `C-c ]`
 
 add item to bibliography:
@@ -304,19 +306,30 @@ add item to bibliography:
 
 
 #+BEGIN_SRC emacs-lisp
+  (use-package helm-bibtex
+    :ensure t
+    :config
+    (setq bibtex-completion-bibliography '( "~/Notes/References/Bibliography.bib" ) ;the major bibtex file
+	  bibtex-completion-library-path '("~/Notes/References/") ;the directory to store pdfs
+	  bibtex-completion-notes-path "~/Notes/References/" ;the note file for reference notes
+	  ))
+  
+  
   (use-package org-ref
-	       :after org
-	       :ensure t
-	       :config
-	       (setq bibtex-completion-bibliography '( "~/Notes/References/Bibliography.bib" ) ;the major bibtex file
-		     bibtex-completion-library-path "~/Notes/References/" ;the directory to store pdfs
-		     bibtex-completion-notes-path nil ;"~/Notes/References/" ;the note file for reference notes
-		     org-ref-default-bibliography '( "~/Notes/References/Bibliography.bib" )
-		     org-ref-bibliography-notes "~/Notes/References/"
-		     org-ref-pdf-directory "~/Notes/References/"
-		     org-ref-notes-function 'org-ref-notes-function-many-files))
-
-
+		   :after org
+		   :ensure t
+		   :config
+		   (require 'org-ref-helm)
+		   (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+			 org-ref-insert-cite-function 'org-ref-cite-insert-helm
+			 org-ref-insert-label-function 'org-ref-insert-label-link
+			 org-ref-insert-ref-function 'org-ref-insert-ref-link
+			 org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
+		   :bind
+		   (:map org-mode-map
+			 ("C-c ]" . 'org-ref-insert-link)))
+  
+  
 #+END_SRC
 
 ** TODO org-pdftools
@@ -387,6 +400,7 @@ To figure out what face is being used for an element, position cursor on element
 
   Use "C-M-i" for completion of node names at point
 
+  "C-c n c" to make headline into node
   To make a heading into a node, you need to assign an ID to it
   using "M-x org-id-get-create"
   
@@ -394,23 +408,76 @@ To figure out what face is being used for an element, position cursor on element
 
   
 #+BEGIN_SRC emacs-lisp
-    (use-package org-roam
+  (setq org-roam-v2-ack t)
+  
+  (use-package org-roam
       :ensure t
       :custom
       (org-roam-directory (file-truename "~/RoamFiles"))
-      (org-roam-completion-everywhere t)
+      (org-roam-completion-everywhere t) 
       :bind
       (("C-c n l" . org-roam-buffer-toggle)
        ("C-c n f" . org-roam-node-find)
        ("C-c n i" . org-roam-node-insert)
        :map org-mode-map
-       ("C-M-i" . completion-at-point))
-
+       ("C-M-i" . completion-at-point)
+       ("C-c n c" . org-id-get-create))
       :config
       (org-roam-setup))
 #+END_SRC
 
+** org-ref-bibtex
+   
+   Connector between org-roam, bibtex-completion, and org-ref
+   
+#+BEGIN_SRC emacs-lisp
+   (use-package org-roam-bibtex
+     :ensure t
+     :after (org-roam)
+     :hook org-roam-mode
+     :config
+     (setq orb-preformat-keywords
+   	'("citekey" "title" "url" "author-or-editor" "keywords" "file")
+   	orb-process-file-keyword t
+   	orb-attached-file-extensions '("pdf"))
+      (add-to-list 'org-roam-capture-templates
+      	       '("n" "bibliography reference + notes" plain
+      		 ""
+      		 :if-new
+      		 (file+head "/home/florian/Notes/References/${citekey}.org" "#+title: ${citekey}: ${title}\n")))
   
+     (require 'org-ref))
+  
+#+END_SRC
+
+
+
+#+BEGIN_QUOTE
+%^{title}
+  :PROPERTIES:
+  :ROAM_KEY: %^{citekey}
+  :URL: %^{url}
+  :AUTHOR: %^{author-or-editor}
+  :NOTER_DOCUMENT: %^{file}  ; <== special file keyword: if more than one filename
+  :NOTER_PAGE:               ;     is available, the user will be prompted to choose
+  :END:
+
+
+    (add-to-list 'org-roam-capture-templates
+	       '("r" "bibliography reference" plain
+		 "
+		 %^{title}
+  :PROPERTIES:
+  :ROAM_KEY: %^{citekey}
+  :URL: %^{url}
+  :AUTHOR: %^{author-or-editor}
+  :END:"
+		 :if-new
+		 (file+head "References/${citekey}.org" "#+title: %^{citekey}: %^{title}\n")))
+#+END_QUOTE
+
+
+
 
 * LanguageServer
 

@@ -123,7 +123,11 @@
     (setq org-element-use-cache nil)
     (setq org-latex-to-pdf-process (list "latexmk -pdf %f"))
     (setq org-agenda-files (quote ("/home/florian/Notes")))
-    ;;(push '("jupyter-julia" . julia) org-src-lang-modes)
+
+    ;; when ESS is used, the julia REPL is started with jupyter-repl-lang-mode as ess-julia-mode
+    ;; then we might need to set
+    ;;(push '("jupyter-julia" . ess-julia) org-src-lang-modes)
+
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t)
@@ -155,17 +159,28 @@
 (use-package org-noter
   :ensure t)
 
+(use-package helm-bibtex
+  :ensure t
+  :config
+  (setq bibtex-completion-bibliography '( "~/Notes/References/Bibliography.bib" ) ;the major bibtex file
+	bibtex-completion-library-path '("~/Notes/References/") ;the directory to store pdfs
+	bibtex-completion-notes-path "~/Notes/References/" ;the note file for reference notes
+	))
+
+
 (use-package org-ref
-	     :after org
-	     :ensure t
-	     :config
-	     (setq bibtex-completion-bibliography '( "~/Notes/References/Bibliography.bib" ) ;the major bibtex file
-		   bibtex-completion-library-path "~/Notes/References/" ;the directory to store pdfs
-		   bibtex-completion-notes-path nil ;"~/Notes/References/" ;the note file for reference notes
-		   org-ref-default-bibliography '( "~/Notes/References/Bibliography.bib" )
-		   org-ref-bibliography-notes "~/Notes/References/"
-		   org-ref-pdf-directory "~/Notes/References/"
-		   org-ref-notes-function 'org-ref-notes-function-many-files))
+		 :after org
+		 :ensure t
+		 :config
+		 (require 'org-ref-helm)
+		 (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+		       org-ref-insert-cite-function 'org-ref-cite-insert-helm
+		       org-ref-insert-label-function 'org-ref-insert-label-link
+		       org-ref-insert-ref-function 'org-ref-insert-ref-link
+		       org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
+		 :bind
+		 (:map org-mode-map
+		       ("C-c ]" . 'org-ref-insert-link)))
 
 (use-package org-pdftools
   :ensure t
@@ -199,20 +214,39 @@
   :ensure t
   :after ox)
 
-(use-package org-roam
-  :ensure t
-  :custom
-  (org-roam-directory (file-truename "~/RoamFiles"))
-  (org-roam-completion-everywhere t)
-  :bind
-  (("C-c n l" . org-roam-buffer-toggle)
-   ("C-c n f" . org-roam-node-find)
-   ("C-c n i" . org-roam-node-insert)
-   :map org-mode-map
-   ("C-M-i" . completion-at-point))
+(setq org-roam-v2-ack t)
 
+(use-package org-roam
+    :ensure t
+    :custom
+    (org-roam-directory (file-truename "~/RoamFiles"))
+    (org-roam-completion-everywhere t) 
+    :bind
+    (("C-c n l" . org-roam-buffer-toggle)
+     ("C-c n f" . org-roam-node-find)
+     ("C-c n i" . org-roam-node-insert)
+     :map org-mode-map
+     ("C-M-i" . completion-at-point)
+     ("C-c n c" . org-id-get-create))
+    :config
+    (org-roam-setup))
+
+(use-package org-roam-bibtex
+  :ensure t
+  :after (org-roam)
+  :hook org-roam-mode
   :config
-  (org-roam-setup))
+  (setq orb-preformat-keywords
+     '("citekey" "title" "url" "author-or-editor" "keywords" "file")
+     orb-process-file-keyword t
+     orb-attached-file-extensions '("pdf"))
+   (add-to-list 'org-roam-capture-templates
+      	    '("n" "bibliography reference + notes" plain
+      	      ""
+      	      :if-new
+      	      (file+head "/home/florian/Notes/References/${citekey}.org" "#+title: ${citekey}: ${title}\n")))
+
+  (require 'org-ref))
 
 (use-package lsp-mode
   :ensure t
