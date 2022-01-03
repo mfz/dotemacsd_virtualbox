@@ -232,7 +232,7 @@ S-RET    un/fold multiline overlays
        'org-babel-load-languages
        '((python . t)
 	 (sqlite . t)
-	 ;(R . t)
+	 (R . t)
 	 (shell . t)
 	 (dot . t)
          ;(julia . t)
@@ -311,7 +311,18 @@ create hyperlink pdftools:file.pdf
 
 #+END_SRC
 
+** ox-hugo
 
+   export org files as hugo markdown
+
+   #+BEGIN_SRC emacs-lisp
+(use-package ox-hugo
+  :ensure t            ;Auto-install the package from Melpa (optional)
+  :after ox)
+
+   #+END_SRC
+
+   
 ** faces
 
 How emacs displays is determined by faces.

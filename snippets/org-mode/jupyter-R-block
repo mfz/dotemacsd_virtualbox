@@ -2,6 +2,6 @@
 # name: jupyter-R-block
 # key: <jr
 # --
-#+BEGIN_SRC jupyter-R :session R :kernel ir36 :display plain
+#+BEGIN_SRC jupyter-R :session R :kernel ir40 :display plain
 $0
 #+END_SRC
