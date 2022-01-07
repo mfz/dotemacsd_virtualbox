@@ -132,7 +132,7 @@
      'org-babel-load-languages
      '((python . t)
        (sqlite . t)
-       ;(R . t)
+       (R . t)
        (shell . t)
        (dot . t)
        ;;(julia . t)
@@ -186,6 +186,10 @@
   :ensure t
   :hook (org-mode . org-pdftools-setup-link))
 
+(use-package ox-hugo
+  :ensure t            ;Auto-install the package from Melpa (optional)
+  :after ox)
+
 (set-face-attribute 'org-meta-line nil :height 0.8 :slant 'normal
 		    :foreground "#C0C0C0")
 
@@ -214,10 +218,14 @@
   :ensure t
   :after ox)
 
+(use-package helm-org-rifle
+  :ensure t)
+
 (setq org-roam-v2-ack t)
 
 (use-package org-roam
     :ensure t
+    :hook (org-load . org-roam-setup)
     :custom
     (org-roam-directory (file-truename "~/RoamFiles"))
     (org-roam-completion-everywhere t) 
@@ -229,7 +237,7 @@
      ("C-M-i" . completion-at-point)
      ("C-c n c" . org-id-get-create))
     :config
-    (org-roam-setup))
+    (org-roam-bibtex-mode +1))
 
 (use-package org-roam-bibtex
   :ensure t
@@ -248,13 +256,13 @@
 
   (require 'org-ref))
 
-(use-package lsp-mode
-  :ensure t
-  :commands (lsp lsp-deferred)
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :config
-  (lsp-enable-which-key-integration t))
+;; (use-package lsp-mode
+;;   :ensure t
+;;   :commands (lsp lsp-deferred)
+;;   :init
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   :config
+;;   (lsp-enable-which-key-integration t))
 
 (defvar fz/image-dir "Images")
 

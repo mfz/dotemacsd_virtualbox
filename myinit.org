@@ -132,6 +132,8 @@ Use C-; to force completion
   
 #+END_SRC
 
+See https://sixty-north.com/blog/writing-the-simplest-emacs-company-mode-backend.html
+on how to write a company backend
 
 * ivy and counsel
 
@@ -400,6 +402,20 @@ To figure out what face is being used for an element, position cursor on element
 #+END_SRC
 
 
+
+** helm-org-rifle
+
+   Similar to org-occur, but shows heading and context as well, not
+   only line and file
+
+   #+BEGIN_SRC emacs-lisp
+
+     (use-package helm-org-rifle
+       :ensure t)
+   #+END_SRC
+
+   E.g. `helm-org-rifle-agenda-files` searches org agenda files
+   
    
 * org-roam
 
@@ -420,9 +436,10 @@ To figure out what face is being used for an element, position cursor on element
   
 #+BEGIN_SRC emacs-lisp
   (setq org-roam-v2-ack t)
-  
+
   (use-package org-roam
       :ensure t
+      :hook (org-load . org-roam-setup)
       :custom
       (org-roam-directory (file-truename "~/RoamFiles"))
       (org-roam-completion-everywhere t) 
@@ -434,10 +451,10 @@ To figure out what face is being used for an element, position cursor on element
        ("C-M-i" . completion-at-point)
        ("C-c n c" . org-id-get-create))
       :config
-      (org-roam-setup))
+      (org-roam-bibtex-mode +1))
 #+END_SRC
 
-** org-ref-bibtex
+** org-roam-bibtex
    
    Connector between org-roam, bibtex-completion, and org-ref
    
@@ -496,13 +513,13 @@ see, for example,  https://www.mortens.dev/blog/emacs-and-the-language-server-pr
 
 
 #+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :ensure t
-    :commands (lsp lsp-deferred)
-    :init
-    (setq lsp-keymap-prefix "C-c l")
-    :config
-    (lsp-enable-which-key-integration t))
+  ;; (use-package lsp-mode
+  ;;   :ensure t
+  ;;   :commands (lsp lsp-deferred)
+  ;;   :init
+  ;;   (setq lsp-keymap-prefix "C-c l")
+  ;;   :config
+  ;;   (lsp-enable-which-key-integration t))
 #+END_SRC
 
 
