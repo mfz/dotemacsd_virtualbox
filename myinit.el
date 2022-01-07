@@ -86,6 +86,14 @@
   :bind
   (("C-s" . swiper)))
 
+;; (use-package all-the-icons-ivy-rich
+;;   :ensure t
+;;   :init (all-the-icons-ivy-rich-mode 1))
+
+;; (use-package ivy-rich
+;;   :ensure t
+;;   :init (ivy-rich-mode 1))
+
 (use-package yasnippet
   :ensure t
   :init
@@ -240,21 +248,21 @@
     (org-roam-bibtex-mode +1))
 
 (use-package org-roam-bibtex
-  :ensure t
-  :after (org-roam)
-  :hook org-roam-mode
-  :config
-  (setq orb-preformat-keywords
-     '("citekey" "title" "url" "author-or-editor" "keywords" "file")
-     orb-process-file-keyword t
-     orb-attached-file-extensions '("pdf"))
-   (add-to-list 'org-roam-capture-templates
-      	    '("n" "bibliography reference + notes" plain
-      	      ""
-      	      :if-new
-      	      (file+head "/home/florian/Notes/References/${citekey}.org" "#+title: ${citekey}: ${title}\n")))
+   :ensure t
+   :after (org-roam)
+;;   :hook org-roam-mode
+;;   :config
+;;   (setq orb-preformat-keywords
+;;      '("citekey" "title" "url" "author-or-editor" "keywords" "file")
+;;      orb-process-file-keyword t
+;;      orb-attached-file-extensions '("pdf"))
+;;    (add-to-list 'org-roam-capture-templates
+;;       	    '("n" "bibliography reference + notes" plain
+;;       	      ""
+;;       	      :if-new
+;;       	      (file+head "/home/florian/Notes/References/${citekey}.org" "#+title: ${citekey}: ${title}\n")))
 
-  (require 'org-ref))
+   (require 'org-ref))
 
 ;; (use-package lsp-mode
 ;;   :ensure t

@@ -43,7 +43,6 @@ Interface tweaks
 
 #+END_SRC
 
-
 * Themes
 ** Doom
   
@@ -67,8 +66,7 @@ Interface tweaks
 
  #+END_SRC
 
- 
-** Solarized :DISABLED: 
+** Solarized                                                       :DISABLED: 
 
  #+BEGIN_SRC emacs-lisp
    (use-package solarized-theme
@@ -77,7 +75,6 @@ Interface tweaks
      :init (load-theme 'solarized-light t))
  #+END_SRC
       
-
 * Minor modes
 ** window-numbering
 
@@ -86,8 +83,7 @@ Interface tweaks
     :ensure t
     :init (window-numbering-mode t))
  #+END_SRC
-   
-  
+     
 ** paren
 
  #+BEGIN_SRC emacs-lisp
@@ -108,7 +104,6 @@ Interface tweaks
      :config
      (which-key-mode))
  #+END_SRC
-
 
 * company-mode
 
@@ -132,9 +127,12 @@ Use C-; to force completion
   
 #+END_SRC
 
+<<<<<<< HEAD
 See https://sixty-north.com/blog/writing-the-simplest-emacs-company-mode-backend.html
 on how to write a company backend
 
+=======
+>>>>>>> 6d27f04b264c4d4b5cc75a190d8bf6caf9f9e807
 * ivy and counsel
 
 ivy is a narrowing-completion framework (used, e.g. in `C-x b`,  ivy-switch-buffer)
@@ -168,7 +166,25 @@ When we do not want completion, use C-M-j to select current input
 
 #+END_SRC
 
+* ivy-rich [DISABLED]
 
+show more information for completion candidates
+
+uncomment for now, as C-x b is very slow to scroll
+
+but see https://github.com/Yevgnen/ivy-rich/issues/87 for fix
+(ErkiDerLoony)
+
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package all-the-icons-ivy-rich
+  ;;   :ensure t
+  ;;   :init (all-the-icons-ivy-rich-mode 1))
+  
+  ;; (use-package ivy-rich
+  ;;   :ensure t
+  ;;   :init (ivy-rich-mode 1))
+  
+#+END_SRC
 
 * yasnippet
 
@@ -193,7 +209,6 @@ used for org-noter
     (pdf-tools-install :no-query))
 
 #+END_SRC
-
 
 * jupyter
 
@@ -225,10 +240,7 @@ C-c C-z `jupyter-repl-pop-to-buffer'
     (setq jupyter-eval-use-overlays t))
 #+END_SRC
 
-
-
 * org-mode
-
 ** org
 
 #+BEGIN_SRC emacs-lisp
@@ -347,6 +359,7 @@ create hyperlink pdftools:file.pdf
 
 #+END_SRC
 
+
 ** ox-hugo
 
    export org files as hugo markdown
@@ -358,7 +371,7 @@ create hyperlink pdftools:file.pdf
 
    #+END_SRC
 
-   
+  
 ** faces
 
 How emacs displays is determined by faces.
@@ -390,7 +403,6 @@ To figure out what face is being used for an element, position cursor on element
   ;; 			    ))
 #+END_SRC
 
-
 ** ox-hugo
 
    Allows export of org-files as hugo markdown to generate static html pages
@@ -400,6 +412,7 @@ To figure out what face is being used for an element, position cursor on element
     :ensure t
     :after ox)
 #+END_SRC
+
 
 
 
@@ -416,7 +429,7 @@ To figure out what face is being used for an element, position cursor on element
 
    E.g. `helm-org-rifle-agenda-files` searches org agenda files
    
-   
+ 
 * org-roam
 
   Notes with backlinks, Second Brain
@@ -462,17 +475,18 @@ To figure out what face is being used for an element, position cursor on element
    (use-package org-roam-bibtex
      :ensure t
      :after (org-roam)
-     :hook org-roam-mode
+  ;;   :hook org-roam-mode
      :config
-     (setq orb-preformat-keywords
-   	'("citekey" "title" "url" "author-or-editor" "keywords" "file")
-   	orb-process-file-keyword t
-   	orb-attached-file-extensions '("pdf"))
-      (add-to-list 'org-roam-capture-templates
-      	       '("n" "bibliography reference + notes" plain
-      		 ""
-      		 :if-new
-      		 (file+head "/home/florian/Notes/References/${citekey}.org" "#+title: ${citekey}: ${title}\n")))
+     (setq orb-roam-ref-format 'org-ref-v3)
+  ;;   (setq orb-preformat-keywords
+  ;;      '("citekey" "title" "url" "author-or-editor" "keywords" "file")
+  ;;      orb-process-file-keyword t
+  ;;      orb-attached-file-extensions '("pdf"))
+  ;;    (add-to-list 'org-roam-capture-templates
+  ;;       	    '("n" "bibliography reference + notes" plain
+  ;;       	      ""
+  ;;       	      :if-new
+  ;;       	      (file+head "/home/florian/Notes/References/${citekey}.org" "#+title: ${citekey}: ${title}\n")))
   
      (require 'org-ref))
   
@@ -504,10 +518,7 @@ To figure out what face is being used for an element, position cursor on element
 		 (file+head "References/${citekey}.org" "#+title: %^{citekey}: %^{title}\n")))
 #+END_QUOTE
 
-
-
-
-* LanguageServer
+* LanguageServer [DISABLED]
 
 see, for example,  https://www.mortens.dev/blog/emacs-and-the-language-server-protocol/index.html 
 
@@ -521,7 +532,6 @@ see, for example,  https://www.mortens.dev/blog/emacs-and-the-language-server-pr
   ;;   :config
   ;;   (lsp-enable-which-key-integration t))
 #+END_SRC
-
 
 * fz extensions
 
