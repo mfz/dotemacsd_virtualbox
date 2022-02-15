@@ -111,11 +111,14 @@ company is an in-buffer code completion framework
 
 Use C-; to force completion
 
+Do not enable global company mode, as it causes problems with jupyter-julia
+
 #+BEGIN_SRC emacs-lisp
   (use-package company
       :ensure t
       :init
-      (global-company-mode t)
+      (global-company-mode nil)
+      (setq company-global-modes '(not julia-mode jupyter-repl-mode))
       :bind ("C-;" . company-complete-common)
       )
   
@@ -127,12 +130,10 @@ Use C-; to force completion
   
 #+END_SRC
 
-<<<<<<< HEAD
+
 See https://sixty-north.com/blog/writing-the-simplest-emacs-company-mode-backend.html
 on how to write a company backend
 
-=======
->>>>>>> 6d27f04b264c4d4b5cc75a190d8bf6caf9f9e807
 * ivy and counsel
 
 ivy is a narrowing-completion framework (used, e.g. in `C-x b`,  ivy-switch-buffer)
@@ -144,26 +145,29 @@ When we do not want completion, use C-M-j to select current input
 
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :ensure t
-    :init (ivy-mode 1)
-    :config
-    (setq ivy-use-virtual-buffers t
-          ivy-count-format "%d/%d "))
-
-  (use-package counsel
-    :ensure t
-    :bind*
-    (("M-x"         . counsel-M-x)
-     ("C-x C-f"     . counsel-find-file)
-     ))
-
-  (use-package swiper
-    :ensure t
-    :bind
-    (("C-s" . swiper)))
-
-
+    (use-package ivy
+      :ensure t
+      :init (ivy-mode 1)
+      :config
+      (setq ivy-use-virtual-buffers t
+	    ivy-count-format "%d/%d ")
+      (setq ivy-re-builders-alist
+	  '((t . ivy--regex-plus)
+	    (org-roam-node-find . ivy--regex-ignore-order))))
+  
+    (use-package counsel
+      :ensure t
+      :bind*
+      (("M-x"         . counsel-M-x)
+       ("C-x C-f"     . counsel-find-file)
+       ))
+  
+    (use-package swiper
+      :ensure t
+      :bind
+      (("C-s" . swiper)))
+  
+  
 #+END_SRC
 
 * ivy-rich [DISABLED]
@@ -209,6 +213,19 @@ used for org-noter
     (pdf-tools-install :no-query))
 
 #+END_SRC
+
+
+* ess-mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ess
+    :ensure t
+    :init
+    (require 'ess-site)
+    :config
+    (setq indent-tabs-mode nil))
+#+END_SRC
+
 
 * jupyter
 
@@ -260,9 +277,7 @@ C-c C-z `jupyter-repl-pop-to-buffer'
       (setq org-latex-to-pdf-process (list "latexmk -pdf %f"))
       (setq org-agenda-files (quote ("/home/florian/Notes")))
   
-      ;; when ESS is used, the julia REPL is started with jupyter-repl-lang-mode as ess-julia-mode
-      ;; then we might need to set
-      ;;(push '("jupyter-julia" . ess-julia) org-src-lang-modes)
+  
   
       (org-babel-do-load-languages
        'org-babel-load-languages
@@ -271,8 +286,13 @@ C-c C-z `jupyter-repl-pop-to-buffer'
 	 (R . t)
 	 (shell . t)
 	 (dot . t)
-	 ;;(julia . t)
+	 (julia . t)
 	 (jupyter . t)))
+  
+      ;; when ESS is used, the julia REPL is started with jupyter-repl-lang-mode as ess-julia-mode
+      ;; then we might need to set
+      (push '("jupyter-julia" . ess-julia) org-src-lang-modes)
+  
       (setq org-babel-sh-command "bash")
       ; don't ask for permission when executing code blocks
       (setq org-confirm-babel-evaluate nil)
@@ -449,7 +469,7 @@ To figure out what face is being used for an element, position cursor on element
   
 #+BEGIN_SRC emacs-lisp
   (setq org-roam-v2-ack t)
-
+  
   (use-package org-roam
       :ensure t
       :hook (org-load . org-roam-setup)
@@ -464,6 +484,14 @@ To figure out what face is being used for an element, position cursor on element
        ("C-M-i" . completion-at-point)
        ("C-c n c" . org-id-get-create))
       :config
+      (cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
+	(let ((level (org-roam-node-level node)))
+	  (concat
+	   (when (> level 0) (concat (org-roam-node-file-title node) " > "))
+	   (when (> level 1) (concat (string-join (org-roam-node-olp node) " > ") " > "))
+	   (org-roam-node-title node))))
+  
+      (setq org-roam-node-display-template "${hierarchy:*} ${tags:20}")
       (org-roam-bibtex-mode +1))
 #+END_SRC
 

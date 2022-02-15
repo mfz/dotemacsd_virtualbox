@@ -59,7 +59,8 @@
 (use-package company
     :ensure t
     :init
-    (global-company-mode t)
+    (global-company-mode nil)
+    (setq company-global-modes '(not julia-mode jupyter-repl-mode))
     :bind ("C-;" . company-complete-common)
     )
 
@@ -72,7 +73,10 @@
   :init (ivy-mode 1)
   :config
   (setq ivy-use-virtual-buffers t
-        ivy-count-format "%d/%d "))
+	ivy-count-format "%d/%d ")
+  (setq ivy-re-builders-alist
+      '((t . ivy--regex-plus)
+	(org-roam-node-find . ivy--regex-ignore-order))))
 
 (use-package counsel
   :ensure t
@@ -105,6 +109,13 @@
   (setq-default pdf-view-display-size 'fit-page)
   (pdf-tools-install :no-query))
 
+(use-package ess
+  :ensure t
+  :init
+  (require 'ess-site)
+  :config
+  (setq indent-tabs-mode nil))
+
 (use-package julia-mode
   :ensure t)
 
@@ -132,9 +143,7 @@
     (setq org-latex-to-pdf-process (list "latexmk -pdf %f"))
     (setq org-agenda-files (quote ("/home/florian/Notes")))
 
-    ;; when ESS is used, the julia REPL is started with jupyter-repl-lang-mode as ess-julia-mode
-    ;; then we might need to set
-    ;;(push '("jupyter-julia" . ess-julia) org-src-lang-modes)
+
 
     (org-babel-do-load-languages
      'org-babel-load-languages
@@ -143,8 +152,13 @@
        (R . t)
        (shell . t)
        (dot . t)
-       ;;(julia . t)
+       (julia . t)
        (jupyter . t)))
+
+    ;; when ESS is used, the julia REPL is started with jupyter-repl-lang-mode as ess-julia-mode
+    ;; then we might need to set
+    (push '("jupyter-julia" . ess-julia) org-src-lang-modes)
+
     (setq org-babel-sh-command "bash")
     ; don't ask for permission when executing code blocks
     (setq org-confirm-babel-evaluate nil)
@@ -245,13 +259,22 @@
      ("C-M-i" . completion-at-point)
      ("C-c n c" . org-id-get-create))
     :config
+    (cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
+      (let ((level (org-roam-node-level node)))
+	(concat
+	 (when (> level 0) (concat (org-roam-node-file-title node) " > "))
+	 (when (> level 1) (concat (string-join (org-roam-node-olp node) " > ") " > "))
+	 (org-roam-node-title node))))
+
+    (setq org-roam-node-display-template "${hierarchy:*} ${tags:20}")
     (org-roam-bibtex-mode +1))
 
 (use-package org-roam-bibtex
    :ensure t
    :after (org-roam)
 ;;   :hook org-roam-mode
-;;   :config
+   :config
+   (setq orb-roam-ref-format 'org-ref-v3)
 ;;   (setq orb-preformat-keywords
 ;;      '("citekey" "title" "url" "author-or-editor" "keywords" "file")
 ;;      orb-process-file-keyword t
